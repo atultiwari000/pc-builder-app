@@ -24,15 +24,50 @@ import { Card } from "../components/ui/card";
 import axios from "axios";
 
 // Map category to API endpoint and icon
-const CATEGORY_CONFIG: Record<string, { endpoint: string; icon: React.ReactNode; label: string }> = {
-  case: { endpoint: "/api/v1/cases/", icon: <Settings className="w-6 h-6" />, label: "Case" },
-  motherboard: { endpoint: "/api/v1/motherboards/", icon: <Motherboard className="w-6 h-6" />, label: "Motherboard" },
-  cpu: { endpoint: "/api/v1/cpus/", icon: <Cpu className="w-6 h-6" />, label: "Processor" },
-  gpu: { endpoint: "/api/v1/gpus/", icon: <Monitor className="w-6 h-6" />, label: "Graphics Card" },
-  psu: { endpoint: "/api/v1/power-supplies/", icon: <Zap className="w-6 h-6" />, label: "Power Supply" },
-  cooling: { endpoint: "/api/v1/cpu-coolers/", icon: <Fan className="w-6 h-6" />, label: "Cooling" },
-  memory: { endpoint: "/api/v1/ram/", icon: <MemoryStick className="w-6 h-6" />, label: "Memory" },
-  storage: { endpoint: "/api/v1/storage/", icon: <HardDrive className="w-6 h-6" />, label: "Storage" },
+const CATEGORY_CONFIG: Record<
+  string,
+  { endpoint: string; icon: React.ReactNode; label: string }
+> = {
+  case: {
+    endpoint: "/api/v1/cases/",
+    icon: <Settings className="w-6 h-6" />,
+    label: "Case",
+  },
+  motherboard: {
+    endpoint: "/api/v1/motherboards/",
+    icon: <Motherboard className="w-6 h-6" />,
+    label: "Motherboard",
+  },
+  cpu: {
+    endpoint: "/api/v1/cpus/",
+    icon: <Cpu className="w-6 h-6" />,
+    label: "Processor",
+  },
+  gpu: {
+    endpoint: "/api/v1/gpus/",
+    icon: <Monitor className="w-6 h-6" />,
+    label: "Graphics Card",
+  },
+  psu: {
+    endpoint: "/api/v1/power-supplies/",
+    icon: <Zap className="w-6 h-6" />,
+    label: "Power Supply",
+  },
+  cooling: {
+    endpoint: "/api/v1/cpu-coolers/",
+    icon: <Fan className="w-6 h-6" />,
+    label: "Cooling",
+  },
+  memory: {
+    endpoint: "/api/v1/ram/",
+    icon: <MemoryStick className="w-6 h-6" />,
+    label: "Memory",
+  },
+  storage: {
+    endpoint: "/api/v1/storage/",
+    icon: <HardDrive className="w-6 h-6" />,
+    label: "Storage",
+  },
 };
 
 // Map UI categories to backend compatibility types
@@ -69,10 +104,19 @@ type Item = {
 
 const BuilderPage = () => {
   const { user, logout, fetchUser } = useAuthStore();
-  const { selectedComponents, selectComponent, getTotalPrice, removeComponent } = useBuilderStore();
+  const {
+    selectedComponents,
+    selectComponent,
+    getTotalPrice,
+    removeComponent,
+  } = useBuilderStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [itemsByCategory, setItemsByCategory] = useState<Record<string, Item[]>>({});
-  const [loadingByCategory, setLoadingByCategory] = useState<Record<string, boolean>>({});
+  const [itemsByCategory, setItemsByCategory] = useState<
+    Record<string, Item[]>
+  >({});
+  const [loadingByCategory, setLoadingByCategory] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     if (!user) {
@@ -101,7 +145,9 @@ const BuilderPage = () => {
     const params = new URLSearchParams({ type: compatType } as any);
     const sel = getSelectionQuery();
     Object.entries(sel).forEach(([k, v]) => params.append(k, String(v)));
-    const res = await axios.get(`/api/v1/options-with-compatibility/?${params.toString()}`);
+    const res = await axios.get(
+      `/api/v1/options-with-compatibility/?${params.toString()}`
+    );
     const items: Item[] = (res.data || []).map((row: any) => ({
       id: row.id,
       name: row.name,
@@ -114,7 +160,11 @@ const BuilderPage = () => {
 
   // Fetch items lazily when a category is expanded
   const ensureCategoryLoaded = async (categoryId: string, force = false) => {
-    if ((itemsByCategory[categoryId] && !force) || loadingByCategory[categoryId]) return;
+    if (
+      (itemsByCategory[categoryId] && !force) ||
+      loadingByCategory[categoryId]
+    )
+      return;
     setLoadingByCategory((s) => ({ ...s, [categoryId]: true }));
     try {
       const items = await fetchWithCompatibility(categoryId);
@@ -148,7 +198,9 @@ const BuilderPage = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="text-gray-300 ">Welcome, {user?.username || 'User'}</span>
+            <span className="text-gray-300 ">
+              Welcome, {user?.username || "User"}
+            </span>
             <Link to="/visualizer">
               <Button className="!bg-white hover:!bg-gray-50 !text-black border border-gray-300">
                 <Eye className="w-4 h-4 mr-2" />
@@ -169,7 +221,9 @@ const BuilderPage = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">PC Builder</h1>
-          <p className="text-gray-400">Select components to build your perfect PC</p>
+          <p className="text-gray-400">
+            Select components to build your perfect PC
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -186,7 +240,8 @@ const BuilderPage = () => {
                     selectedCategory === categoryId ? "border-blue-500" : ""
                   }`}
                   onClick={async () => {
-                    const next = selectedCategory === categoryId ? null : categoryId;
+                    const next =
+                      selectedCategory === categoryId ? null : categoryId;
                     setSelectedCategory(next);
                     if (next) await ensureCategoryLoaded(categoryId, true);
                   }}
@@ -198,7 +253,9 @@ const BuilderPage = () => {
                         <div>
                           <h3 className="text-lg font-semibold">{cfg.label}</h3>
                           <p className="text-gray-400 text-sm">
-                            {selectedComponent ? selectedComponent.name : `Select ${cfg.label.toLowerCase()}`}
+                            {selectedComponent
+                              ? selectedComponent.name
+                              : `Select ${cfg.label.toLowerCase()}`}
                           </p>
                         </div>
                       </div>
@@ -218,17 +275,21 @@ const BuilderPage = () => {
                       <div className="mt-6 pt-6 border-t border-gray-800">
                         {loading ? (
                           <div className="flex items-center text-gray-400">
-                            <Server className="w-4 h-4 mr-2 animate-pulse" /> Loading...
+                            <Server className="w-4 h-4 mr-2 animate-pulse" />{" "}
+                            Loading...
                           </div>
                         ) : (
                           <div className="space-y-3">
                             {items.map((component) => {
-                              const isCompatible = component.compatible !== false;
+                              const isCompatible =
+                                component.compatible !== false;
                               return (
                                 <div
                                   key={`${categoryId}-${component.id}`}
                                   className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                                    isCompatible ? "bg-gray-800 hover:bg-gray-700" : "bg-gray-800/70 hover:bg-gray-700/70"
+                                    isCompatible
+                                      ? "bg-gray-800 hover:bg-gray-700"
+                                      : "bg-gray-800/70 hover:bg-gray-700/70"
                                   }`}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -243,28 +304,38 @@ const BuilderPage = () => {
                                   }}
                                 >
                                   <div>
-                                    <p className="font-medium">{component.name}</p>
+                                    <p className="font-medium">
+                                      {component.name}
+                                    </p>
                                     {component.model && (
-                                      <p className="text-sm text-gray-400">{component.model}</p>
+                                      <p className="text-sm text-gray-400">
+                                        {component.model}
+                                      </p>
                                     )}
                                   </div>
                                   <div className="flex items-center space-x-3">
                                     {isCompatible ? (
                                       <span className="flex items-center text-green-400 text-sm">
-                                        <CheckCircle className="w-4 h-4 mr-1" /> Compatible
+                                        <CheckCircle className="w-4 h-4 mr-1" />{" "}
+                                        Compatible
                                       </span>
                                     ) : (
                                       <span className="flex items-center text-red-400 text-sm">
-                                        <XCircle className="w-4 h-4 mr-1" /> Incompatible
+                                        <XCircle className="w-4 h-4 mr-1" />{" "}
+                                        Incompatible
                                       </span>
                                     )}
-                                    <p className="font-semibold">${component.price.toLocaleString()}</p>
+                                    <p className="font-semibold">
+                                      ${component.price.toLocaleString()}
+                                    </p>
                                   </div>
                                 </div>
                               );
                             })}
                             {items.length === 0 && (
-                              <div className="text-gray-400 text-sm">No options found.</div>
+                              <div className="text-gray-400 text-sm">
+                                No options found.
+                              </div>
                             )}
                           </div>
                         )}
@@ -297,12 +368,23 @@ const BuilderPage = () => {
               <h3 className="text-xl font-semibold mb-4">Build Summary</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  {Object.entries(selectedComponents).map(([category, component]) => (
-                    <div key={category} className="flex justify-between text-sm">
-                      <span className="text-gray-300 capitalize">{category}</span>
-                      <span>{component ? `$${component.price.toLocaleString()}` : "-"}</span>
-                    </div>
-                  ))}
+                  {Object.entries(selectedComponents).map(
+                    ([category, component]) => (
+                      <div
+                        key={category}
+                        className="flex justify-between text-sm"
+                      >
+                        <span className="text-gray-300 capitalize">
+                          {category}
+                        </span>
+                        <span>
+                          {component
+                            ? `$${component.price.toLocaleString()}`
+                            : "-"}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
                 <div className="border-t border-gray-800 pt-4">
                   <div className="flex justify-between text-lg font-semibold">

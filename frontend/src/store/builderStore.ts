@@ -1,11 +1,19 @@
 import { create } from "zustand"
+import { modelRegistry } from "../components/3d/modelRegistry"
+
+interface Transform {
+  scale?: [number, number, number]
+  position?: [number, number, number]
+  rotation?: [number, number, number]
+}
 
 interface Component {
-  id: number
+  id: string
   name: string
   category: string
   price: number
   model?: string
+  transform?: Transform
 }
 
 interface BuilderState {
@@ -27,10 +35,17 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
     cooling: null,
   },
   selectComponent: (category: string, component: Component) => {
+
+    const withModel: Component = {
+      ...component,
+      model: component.model || modelRegistry[category]?.url,
+      transform: component.transform,
+    }
+
     set((state) => ({
       selectedComponents: {
         ...state.selectedComponents,
-        [category]: component,
+        [category]: withModel,
       },
     }))
   },
