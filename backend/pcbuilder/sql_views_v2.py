@@ -23,7 +23,12 @@ def get_db_connection():
 
 @api_view(['GET'])
 def get_vendors(request):
-    """Get all vendors"""
+    """
+    Retrieve a list of all vendors ordered by name.
+    
+    Returns:
+        Response: A JSON response containing a list of vendors with their IDs and names, or an error message with HTTP 500 status on failure.
+    """
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -222,7 +227,18 @@ def get_options_with_compatibility(request):
 
 @api_view(['GET'])
 def get_cpus(request):
-    """Get all CPUs with filtering options"""
+    """
+    Retrieve all active CPUs with optional filtering by socket type, price range, and vendor.
+    
+    Parameters:
+    	socket_type (str, optional): Filter CPUs by socket type.
+    	min_price (float, optional): Minimum price to include.
+    	max_price (float, optional): Maximum price to include.
+    	vendor_id (int, optional): Filter CPUs by vendor ID.
+    
+    Returns:
+    	Response: A JSON response containing a list of CPUs with vendor names, ordered by price.
+    """
     try:
         socket_type = request.GET.get('socket_type')
         min_price = request.GET.get('min_price')
@@ -292,7 +308,12 @@ def get_cpu_by_id(request, cpu_id):
 
 @api_view(['GET'])
 def get_motherboards(request):
-    """Get all motherboards with filtering options"""
+    """
+    Retrieve all active motherboards with optional filters for socket type, form factor, RAM type, price range, and vendor.
+    
+    Returns:
+        Response: A list of motherboards with vendor names, ordered by price. Returns an error response with HTTP 500 status on failure.
+    """
     try:
         socket_type = request.GET.get('socket_type')
         form_factor = request.GET.get('form_factor')
@@ -350,7 +371,11 @@ def get_motherboards(request):
 
 @api_view(['GET'])
 def get_ram_modules(request):
-    """Get all RAM modules with filtering options"""
+    """
+    Retrieve all active RAM modules with optional filtering by RAM type, speed, price, and vendor.
+    
+    Accepts query parameters for `ram_type`, `min_speed`, `max_speed`, `min_price`, `max_price`, and `vendor_id` to filter results. Returns a list of RAM modules joined with vendor names, ordered by price.
+    """
     try:
         ram_type = request.GET.get('ram_type')
         capacity = request.GET.get('capacity')
@@ -411,7 +436,11 @@ def get_ram_modules(request):
 
 @api_view(['GET'])
 def get_gpus(request):
-    """Get all GPUs with filtering options"""
+    """
+    Retrieve all active GPUs with optional filtering by price and vendor.
+    
+    Accepts optional query parameters for minimum and maximum price, and vendor ID. Returns a list of GPUs joined with vendor name, ordered by price.
+    """
     try:
         min_memory = request.GET.get('min_memory')
         max_memory = request.GET.get('max_memory')
@@ -461,7 +490,20 @@ def get_gpus(request):
 
 @api_view(['GET'])
 def get_storage_devices(request):
-    """Get all storage devices with filtering options"""
+    """
+    Retrieve all active storage devices with optional filters for type, interface, price range, and vendor.
+    
+    Parameters:
+        request: The HTTP request containing optional query parameters for filtering:
+            - storage_type: Filter by storage device type.
+            - interface: Filter by storage interface.
+            - min_price: Minimum price filter.
+            - max_price: Maximum price filter.
+            - vendor_id: Filter by vendor ID.
+    
+    Returns:
+        Response: A JSON list of storage devices with vendor names, ordered by price. Returns an error message with HTTP 500 status on failure.
+    """
     try:
         storage_type = request.GET.get('storage_type')
         interface = request.GET.get('interface')
@@ -518,7 +560,14 @@ def get_storage_devices(request):
 
 @api_view(['GET'])
 def get_power_supplies(request):
-    """Get all power supplies with filtering options"""
+    """
+    Retrieve all active power supplies with optional filtering by wattage, price, and vendor.
+    
+    Filters can be applied using query parameters: `min_wattage`, `max_wattage`, `min_price`, `max_price`, and `vendor_id`. Results are ordered by wattage descending and then by price.
+    
+    Returns:
+        Response: A JSON list of power supplies with vendor names, or an error message with HTTP 500 status on failure.
+    """
     try:
         min_wattage = request.GET.get('min_wattage')
         max_wattage = request.GET.get('max_wattage')
@@ -575,7 +624,12 @@ def get_power_supplies(request):
 
 @api_view(['GET'])
 def get_cases(request):
-    """Get all cases with filtering options"""
+    """
+    Retrieve all active PC cases with optional filters for form factor, GPU length, price range, vendor, and side panel type.
+    
+    Returns:
+        Response: A list of case objects with vendor names, filtered and ordered by price.
+    """
     try:
         form_factor = request.GET.get('form_factor')
         min_gpu_length = request.GET.get('min_gpu_length')
@@ -638,7 +692,17 @@ def get_cases(request):
 
 @api_view(['GET'])
 def get_cpu_coolers(request):
-    """Get all CPU coolers with filtering options"""
+    """
+    Retrieve all active CPU coolers with optional filtering by socket type, price range, and vendor.
+    
+    Filters:
+        - socket_type: Only include coolers supporting the specified CPU socket.
+        - min_price, max_price: Restrict results to coolers within the given price range.
+        - vendor_id: Only include coolers from the specified vendor.
+    
+    Returns:
+        JSON response containing a list of CPU coolers with vendor names.
+    """
     try:
         cooler_type = request.GET.get('cooler_type')
         socket_type = request.GET.get('socket_type')
@@ -882,7 +946,15 @@ def check_compatibility(request):
 
 @api_view(['GET'])
 def search_components(request):
-    """Search across all component types"""
+    """
+    Searches for components by name or model across CPUs, motherboards, and GPUs.
+    
+    Parameters:
+        request: The HTTP request containing the search query string `q` and optional `type` parameter to filter by component type.
+    
+    Returns:
+        Response: A JSON object with up to 10 matching results per component type, including basic details for each component. Returns HTTP 400 if the query is missing, or HTTP 500 on error.
+    """
     try:
         query = request.GET.get('q', '')
         component_type = request.GET.get('type', 'all')  # all, cpu, motherboard, etc.

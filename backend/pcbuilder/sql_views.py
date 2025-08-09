@@ -8,6 +8,12 @@ import json
 from django.db import connection
 
 def get_db_connection():
+    """
+    Establish and return a new PostgreSQL database connection using Django settings.
+    
+    Returns:
+        connection: A new psycopg2 connection object to the configured PostgreSQL database.
+    """
     return psycopg2.connect(
         host=settings.DATABASES['default']['HOST'],
         database=settings.DATABASES['default']['NAME'],
@@ -18,6 +24,12 @@ def get_db_connection():
 
 @api_view(['GET'])
 def get_vendors(request):
+    """
+    Retrieve a list of all vendors from the database, ordered by name.
+    
+    Returns:
+        Response: A JSON array of vendor objects, each containing 'id' and 'name'. Returns an error response with HTTP 500 status if a database error occurs.
+    """
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -33,6 +45,11 @@ def get_vendors(request):
 
 @api_view(['GET'])
 def get_cpus(request):
+    """
+    Retrieve a list of CPUs with optional filtering by socket type, price range, and vendor.
+    
+    Accepts query parameters for `socket_type`, `min_price`, `max_price`, and `vendor_id` to filter results. Returns a JSON array of CPU records, each including all CPU fields and the associated vendor name. On error, returns a JSON error message with HTTP 500 status.
+    """
     try:
         socket_type = request.GET.get('socket_type')
         min_price = request.GET.get('min_price')

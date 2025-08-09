@@ -3,6 +3,15 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
+        """
+        Creates and saves a user with the specified email and password.
+        
+        Raises:
+            ValueError: If the email is not provided.
+        
+        Returns:
+            User: The newly created user instance.
+        """
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -28,6 +37,9 @@ class User(AbstractUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
+        """
+        Return the user's email address as its string representation.
+        """
         return self.email
 
 """Lean mode: components/builds handled via raw SQL. Only custom User remains."""

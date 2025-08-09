@@ -3,6 +3,11 @@ from django.apps import AppConfig
 
 def _connect_post_migrate_seed(app_config: AppConfig):
     # Lazy import to avoid early settings/db initialization
+    """
+    Connects a post-migrate signal handler to seed sample data into the database after migrations for the pcbuilder app.
+    
+    This function sets up a signal handler that, upon completion of migrations for the pcbuilder app, checks for the presence of specific SQL files at the repository root. If the `vendors` table does not exist, it attempts to create the schema using `database_schema.sql`. It optionally loads compatibility functions from `compatibility_functions.sql`. If the `vendors` table is empty, it seeds sample data from `sample_data.sql`. All operations are performed safely, with errors silently ignored to avoid interfering with the migration process.
+    """
     from django.conf import settings
     from django.db import connection, transaction
     from django.db.models.signals import post_migrate
@@ -18,6 +23,11 @@ def _connect_post_migrate_seed(app_config: AppConfig):
 
     def seed_sample_data(sender, app_config=None, **kwargs):
         # Only run when pcbuilder app finishes migrating
+        """
+        Seeds the database with sample data after migrations for the 'pcbuilder' app.
+        
+        This function is intended to be used as a Django post-migrate signal handler. It checks for the presence of required SQL files and the existence of the 'vendors' table, creates the schema if necessary, loads compatibility functions if available, and populates the database with sample data if it has not already been seeded. All operations are performed safely to avoid interrupting the migration process.
+        """
         if app_config and app_config.name != 'pcbuilder':
             return
         # Abort if sample file is missing
@@ -87,4 +97,7 @@ class PcbuilderConfig(AppConfig):
     name = 'pcbuilder'
 
     def ready(self):
+        """
+        Initializes the post-migration data seeding process when the app is ready.
+        """
         _connect_post_migrate_seed(self)

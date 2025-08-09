@@ -11,6 +11,15 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        """
+        Creates and returns a new User instance using the provided validated data.
+        
+        Parameters:
+            validated_data (dict): Data that has been validated for creating a new user.
+        
+        Returns:
+            User: The newly created User instance.
+        """
         user = User.objects.create_user(**validated_data)
         return user
     
