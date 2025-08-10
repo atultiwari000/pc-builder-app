@@ -1,6 +1,6 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = "https://pc-builder-app-25.onrender.com/api/v1/";
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
 axios.interceptors.request.use(
