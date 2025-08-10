@@ -294,7 +294,7 @@ const BuilderPage = () => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     selectComponent(categoryId, {
-                                      id: component.id,
+                                      id: component.id.toString(),
                                       name: component.name,
                                       category: categoryId,
                                       price: component.price,

@@ -7,6 +7,14 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+    # Check if the command is runserver and inject port from env if not provided
+    if len(sys.argv) >= 2 and sys.argv[1] == 'runserver':
+        # If user did not specify a port, use env PORT or fallback to 8000
+        if len(sys.argv) == 2:
+            port = os.getenv('PORT', '8000')
+            sys.argv.append(f'0.0.0.0:{port}')
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
